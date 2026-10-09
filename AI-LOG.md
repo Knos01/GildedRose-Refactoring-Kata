@@ -34,6 +34,7 @@ modes the assistant is used in.
 | # | Purpose | Verdict | Commit |
 |---|---------|---------|--------|
 | 00 | Session start: constraints restated before any code | Confirmed | none |
+| 01 | Golden master scaffolding over the upstream 30-day output | Accepted | `0ea38e4` |
 
 ---
 
@@ -53,45 +54,54 @@ top: I state my decision first and the assistant attacks it; every output comes 
 it mechanically; it does not write the refactoring structure or the `Conjured` implementation; it
 reminds me if I move on without logging an output here.
 
-**What the assistant contributed:** a read-only pass (no file edited) over `AGENTS.md`,
-`GildedRose.kt` and the requirements, plus `Item.kt`, the existing test, the text fixture,
-`build.gradle.kts` and this log. It returned three things:
+**What the assistant contributed:** the constraints restated in 12 points with `AGENTS.md` line
+references; five open points left to me (red baseline test, `AGENTS.md` untracked, `Items` property
+also reserved, golden master scope undefined, `Conjured` matching rule); seven predicted
+code-vs-requirements divergences with `GildedRose.kt` line references. Read-only, nothing edited.
 
-- **The constraints restated in 12 points**, each with the `AGENTS.md` line numbers it rests on:
-  code over requirements, `Item.kt` frozen, no new dependencies (so the golden master is hand-written
-  JUnit), behaviour changes only in the `Conjured` commit, characterization before any production
-  edit, no history rewriting, no git writes by the assistant, the may/may-not split of work, the
-  three modes and their done conditions, commit and log discipline, the definition of done, and
-  `AGENTS.md` winning over general assistant instructions.
-- **Five open points, left to me to decide:** the baseline suite is red (`GildedRoseTest.kt:13`
-  asserts `"fixme"` on an item named `"foo"`), so "green from a clean checkout" cannot hold until
-  that test changes, and the build pins a Java 8 toolchain; `AGENTS.md` is still untracked, so its
-  "written before the first code commit" claim is only verifiable once it is committed ahead of any
-  change to `Kotlin/src`; the requirements (line 31) also reserve the `Items` property, i.e.
-  `GildedRose.items`, which `AGENTS.md` does not name; "golden master" is used but its scope
-  (inputs, days, snapshot location) is undefined, and the upstream fixture misses some input cases
-  (quality above 50, negative quality, the bare `"Sulfuras"` name); how a `Conjured` item is
-  recognised (exact name, prefix, contains) and how it combines with the past-date rate and the
-  zero floor is not settled by any code.
-- **Seven predicted divergences between code and requirements**, each as input → output after one
-  `updateQuality()` with the `GildedRose.kt` lines responsible: Brie past date gains 2; a backstage
-  pass on its last day gains 3 then drops to 0 in the same update; the "10 days or less" step is
-  tested on `sellIn` before the decrement; quality above 50 and below 0 on input is not corrected;
-  Sulfuras quality is not forced to 80; plain `"Sulfuras"` is matched as a normal item. It also
-  noted that the past-date check runs after the decrement, so the double rate starts on the update
-  that takes `sellIn` from 0 to -1. These are predictions, to be confirmed or refuted by the first
-  characterization run.
-
-**How I checked it:** the 12 points compared one by one against the `AGENTS.md` lines they cite;
-every line number in the divergence table compared against `GildedRose.kt`;
-`GildedRoseTest.kt:13` and `GildedRoseRequirements.md:31` opened to confirm the two findings that
-rest on them; `git status --short` still lists only `AGENTS.md`, `AI-LOG.md` and `ai-sessions/` as
-untracked, so nothing was edited. All references matched. The divergence outputs themselves are
-not verified by this check: the characterization test is what confirms them.
+**How I checked it:** every cited line compared against `AGENTS.md`, `GildedRose.kt`,
+`GildedRoseTest.kt:13` and `GildedRoseRequirements.md:31`; `git status --short` unchanged. All
+matched. The divergences are left to the characterization test.
 
 **Verdict:** Confirmed
-**What I changed:** nothing. The five open points are design decisions and stay with me.
+**What I changed:** nothing.
 
-**Resulting commit:** none — nothing reached the repository.
+**Resulting commit:** none.
+
+---
+
+## 01 — Golden master scaffolding over the upstream 30-day output
+
+**When:** 9 October 2026, before any production change.
+**Transcript:** [`ai-sessions/session.md`](ai-sessions/session.md), from the golden master request.
+
+**What I asked for:** test scaffolding for my decision: a byte-for-byte copy of
+`texttests/ThirtyDays/stdout.gr` as the approved file, days 0–30, received output to `build/` only.
+Plus the ways the test could pass falsely or fail spuriously, and the exact lines that fail if line
+18 of `GildedRose.kt` becomes `sellIn < 10`.
+
+**What the assistant contributed:**
+
+- **Corrected my motivation.** I chose the upstream copy "because a snapshot of the code would also
+  approve its bugs"; `stdout.gr` comes from the same logic and approves the same bugs. Its real
+  value is that the code under test did not generate it.
+- `ThirtyDays.approved.txt` and `GoldenMasterTest.kt`, plus the risk list and the mutation
+  prediction (10 lines, 81–189).
+- **Deviation from my spec:** the file ends in `\n\n`, so joining lines with `'\n'` falls one byte
+  short; every line is terminated with `'\n'` instead (11,337 bytes).
+- It could not run the test: Gradle download blocked (403) in its shells. All runs below are mine.
+
+**How I checked it:**
+
+1. Untouched code: green.
+2. One character changed in the approved file: red.
+3. Line 18 mutated to `sellIn < 10`: red on exactly the 10 predicted lines.
+4. Quality clamped to 0–50 for non-Sulfuras items: still green, as predicted. Declared gap: the
+   fixture never feeds out-of-range inputs.
+
+**Verdict:** Accepted
+**What I changed:** my motivation; accepted the `'\n'` deviation.
+
+**Resulting commit:** `0ea38e4`.
 
 ---
