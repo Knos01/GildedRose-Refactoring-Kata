@@ -13,6 +13,8 @@ this log does not replace it.
 **Agent configuration:** [`AGENTS.md`](AGENTS.md), in the repository root. It was written before
 the first code commit and sets the constraints, the division of work, and the three task-scoped
 modes the assistant is used in.
+**Verdicts:** Accepted = kept as produced · Modified = kept after my changes · Confirmed = a review
+or reading whose findings I verified · Rejected = discarded.
 
 ## Rules I set for myself before writing any code
 
@@ -37,7 +39,7 @@ modes the assistant is used in.
 | 01 | Golden master scaffolding over the upstream 30-day output | Accepted | `0ea38e4` |
 | 02 | Characterization tests for cases the golden master misses | Modified | `b115799` |
 | 03 | Adversarial review of the first three refactoring commits | Confirmed | none |
-| 04 | Conjured rule attacked, 14 pending tests | Modified | `ConjuredTest.kt` commit, just before this entry |
+| 04 | Conjured rule attacked, 14 pending tests | Modified | `f9f6745` |
 
 ---
 
@@ -191,7 +193,7 @@ decided.
   dispatch, so the copies were pruned.
 - `git show df7f230`: the four changes are in the same diff.
 - Test results now on disk: a run on `df7f230` (compiled class contains `increaseQuality`), 18
-  tests, 0 failures. No run on disk for `043c97f`.
+  tests, 0 failures.
 - The 16,380-state comparison is on transcriptions, not on the Kotlin; the Gradle run on `df7f230`
   is the real check.
 
@@ -246,6 +248,6 @@ shown, and the exact golden-master lines that change. Then rows 12–14.
 **What I changed:** rejected objection 1 and pinned it (rows 12–13); accepted 3 (row 14, prefix
 `"Conjured "`); two commits instead of one, as `AGENTS.md` requires. Objection 2 is still open.
 
-**Resulting commit:** the `ConjuredTest.kt` commit, immediately before this entry.
+**Resulting commit:** `f9f6745`
 
 ---

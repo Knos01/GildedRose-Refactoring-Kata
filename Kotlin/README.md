@@ -7,7 +7,7 @@ follows from that.
 
 How the work was done with an AI assistant: [`AGENTS.md`](../AGENTS.md) (rules),
 [`AI-LOG.md`](../AI-LOG.md) (what it produced, what I kept or rejected) and
-[`ai-sessions/`](../ai-sessions/) (transcripts).
+[`ai-sessions/`](../ai-sessions/) (transcript).
 
 ## Install
 
