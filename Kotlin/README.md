@@ -68,7 +68,7 @@ the predicted tests. The results are in `AI-LOG.md`.
 src/main/kotlin/com/gildedrose/
   Item.kt            untouched (owned by the goblin)
   GildedRose.kt      categoryOf + one update function per category + guarded quality helpers
-  TexttestFixture.kt untouched
+  TexttestFixture.kt untouched except for a stale Conjured comment
 src/test/kotlin/com/gildedrose/   the four test classes above
 src/test/resources/               ThirtyDays.approved.txt
 ```
