@@ -73,6 +73,24 @@ src/test/kotlin/com/gildedrose/   the four test classes above
 src/test/resources/               ThirtyDays.approved.txt
 ```
 
+## Assumptions
+
+What the requirements do not say, and what I assumed. The decisions below build on these.
+
+- **A conjured item is a different magical object, not a variant of the product it is named
+  after.** So its own rules replace the base product's rules: a `Conjured Aged Brie` is not an Aged
+  Brie, a `Conjured Sulfuras, Hand of Ragnaros` is not legendary, a conjured backstage pass is not a
+  concert ticket.
+- **Conjured items are named `Conjured <product>`**, as in the only example given (`Conjured Mana
+  Cake`). A name that is exactly `Conjured`, has "Conjured" elsewhere, or uses another case is a
+  normal item. If the supplier names them differently, `categoryOf` is the only place to change.
+- **Name matching is exact and case-sensitive**, as in the original code: `Aged brie` or `Sulfuras`
+  on its own is a normal item.
+- **Quality enters within 0–50 (80 for Sulfuras).** The system never moves a valid quality out of
+  that range, but does not repair an invalid one: a quality of 55 still degrades, −1 stays −1. This
+  is the legacy behaviour for every category; for Conjured, which has no legacy code, it is a choice
+  made for consistency.
+
 ## Decisions
 
 Each one as *X rather than Y, because Z*.
@@ -101,26 +119,15 @@ Each one as *X rather than Y, because Z*.
 **Conjured**
 
 - **Conjured is its own category and overrides the base item's rules**, rather than a modifier on
-  top of them, because a conjured item is a different magical object. So `Conjured Aged Brie` does
-  not gain quality, `Conjured Sulfuras, Hand of Ragnaros` is sold and degrades, and a conjured
-  backstage pass does not drop to 0 after the concert.
+  top of them, because of the first assumption above. Consequences, all pinned in `ConjuredTest`:
+  `Conjured Aged Brie` loses quality instead of gaining it, `Conjured Sulfuras, Hand of Ragnaros` is
+  sold and degrades, and a conjured backstage pass keeps degrading after the concert instead of
+  dropping to 0.
 - **Twice as fast as a normal item**: −2 per day, −4 past the sell-by date, rather than a separate
   rate, because the requirement defines Conjured relative to normal items.
 - **Recognised by the name prefix `"Conjured "`** (with the space, case-sensitive), rather than the
   exact name `Conjured Mana Cake`, because that is the naming of the only example given and it covers
   other conjured products from the same supplier. Exact special names are checked first.
-
-## Assumptions
-
-- Quality enters within 0–50 (80 for Sulfuras). The system **never moves a valid quality out of
-  that range, but does not repair an invalid one**: a quality of 55 still degrades, −1 stays −1.
-  This is the legacy behaviour for every category; for Conjured, which has no legacy code, it is a
-  choice made for consistency.
-- Conjured items are named `Conjured <product>`. A name that is exactly `Conjured`, has "Conjured"
-  elsewhere, or uses another case is a normal item. If the supplier names them differently,
-  `categoryOf` is the only place to change.
-- Name matching is exact and case-sensitive, as in the original code: `Aged brie` or `Sulfuras` on
-  its own is a normal item.
 
 ## Legacy behaviour kept on purpose
 
@@ -133,9 +140,13 @@ Pinned in `CharacterizationTest`, kept rather than fixed because the code is the
 
 ## Known limits and next steps
 
-- The rules still depend on the name strings; a real fix is a type or SKU from the supplier, out of
-  reach while `Item` cannot change.
-- The order "exact names, then the Conjured prefix" cannot be tested today: no special name starts
-  with "Conjured".
-- A randomized differential test against a frozen copy of the legacy code would add evidence beyond
-  the hand-picked cases; not done for time.
+- **The rules depend on name strings.** `categoryOf` keeps them in one place, but a real fix would be
+  a type or SKU field from the supplier, which is not possible while `Item` cannot change.
+- **The precedence of exact names over the Conjured prefix is not covered by a test.** `categoryOf`
+  checks the exact special names first, so a future special item whose name starts with
+  "Conjured " would keep its own rules. Today no special name starts with "Conjured ", so no input
+  can tell the two orders apart, and swapping them would not fail any test.
+- **The legacy behaviour is pinned only on hand-picked cases** (golden master + characterization
+  tests). A next step would be a differential test that runs many random items through both the
+  original code (kept as a frozen copy in the tests) and the refactored code and compares the
+  results.
