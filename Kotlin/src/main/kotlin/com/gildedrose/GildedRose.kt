@@ -2,10 +2,10 @@ package com.gildedrose
 
 private enum class Category { AGED_BRIE, BACKSTAGE_PASSES, LEGENDARY, NORMAL }
 
-private fun categoryOf(item: Item): Category = when (item.name) {
-    "Aged Brie" -> Category.AGED_BRIE
-    "Backstage passes to a TAFKAL80ETC concert" -> Category.BACKSTAGE_PASSES
-    "Sulfuras, Hand of Ragnaros" -> Category.LEGENDARY
+private fun categoryOf(item: Item): Category = when {
+    item.name == "Aged Brie" -> Category.AGED_BRIE
+    item.name == "Backstage passes to a TAFKAL80ETC concert" -> Category.BACKSTAGE_PASSES
+    item.name == "Sulfuras, Hand of Ragnaros" -> Category.LEGENDARY
     else -> Category.NORMAL
 }
 
