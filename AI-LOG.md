@@ -35,6 +35,7 @@ modes the assistant is used in.
 |---|---------|---------|--------|
 | 00 | Session start: constraints restated before any code | Confirmed | none |
 | 01 | Golden master scaffolding over the upstream 30-day output | Accepted | `0ea38e4` |
+| 02 | Characterization tests for cases the golden master misses | Modified | `b115799` |
 
 ---
 
@@ -103,5 +104,43 @@ Plus the ways the test could pass falsely or fail spuriously, and the exact line
 **What I changed:** my motivation; accepted the `'\n'` deviation.
 
 **Resulting commit:** `0ea38e4`.
+
+---
+
+## 02 — Characterization tests for cases the golden master misses
+
+**When:** 10 October 2026, before any production change.
+**Transcript:** [`ai-sessions/session.md`](ai-sessions/session.md), from the characterization request.
+
+**What I asked for:** `CharacterizationTest.kt` pinning current behaviour, quirks preserved, for
+13 cases I chose (code quirks, out-of-range inputs, paths missing from the golden master, near-miss
+names). Plus 6 single mutations of `GildedRose.kt` with the tests each must fail, and whether the
+`coerceIn(0, 50)` clamp from entry 01 is now caught.
+
+**What the assistant contributed:**
+
+- The test file and, for each test, the `GildedRose.kt` path that produces its expected value.
+- Three objections:
+  1. My reason cites a brief that is not in the repository. **Rejected:** the sentence is in PTV's
+     email, not in the repo.
+  2. The Brie-at-49 case was labelled as a path the golden master loses at the `Conjured` commit;
+     the golden master never reaches it. **Accepted:** label corrected.
+  3. The near-miss names were only tested before the sell-by date. **Accepted:** 3 past-sell-by
+     cases added (16 tests in total).
+- Its prediction for M1 was wrong, and it flagged the error itself.
+
+**How I checked it:**
+
+1. Baseline: green, 18 tests (16 characterization, 1 golden master, 1 original).
+2. The entry 01 clamp now fails 4 tests (the out-of-range non-Sulfuras ones); in entry 01 it
+   passed.
+3. M1–M6: all killed as predicted (suggested by AI, could be found in the transcript).
+4. Line 41 inverted (`startsWith("Sulfuras")` without `!`): caught by the past-sell-by tests and by
+   the golden master.
+
+**Verdict:** Modified
+**What I changed:** rejected objection 1; accepted 2 and 3, which changed the file.
+
+**Resulting commit:** `b115799`.
 
 ---
