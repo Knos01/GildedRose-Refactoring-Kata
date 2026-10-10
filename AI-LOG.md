@@ -37,6 +37,7 @@ modes the assistant is used in.
 | 01 | Golden master scaffolding over the upstream 30-day output | Accepted | `0ea38e4` |
 | 02 | Characterization tests for cases the golden master misses | Modified | `b115799` |
 | 03 | Adversarial review of the first three refactoring commits | Confirmed | none |
+| 04 | Conjured rule attacked, 14 pending tests | Modified | `ConjuredTest.kt` commit, just before this entry |
 
 ---
 
@@ -199,5 +200,52 @@ decided.
 recorded here.
 
 **Resulting commit:** none.
+
+---
+
+## 04 — Conjured rule attacked, 14 pending tests
+
+**When:** 10 October 2026, after `a46419b`, before the `Conjured` commit.
+**Transcript:** [`ai-sessions/session.md`](ai-sessions/session.md), from my `Conjured` decision.
+
+**What I asked for:** attack my rule (`Conjured` is a category that overrides the base item's
+rules, recognised by a case-sensitive prefix checked after the exact special names, −2 / −4 past
+sell-by, same guarded floor). Then JUnit tests for my 11-row table, marked
+`@Disabled("pending Conjured")`, with each expected value derived from the rule and its arithmetic
+shown, and the exact golden-master lines that change. Then rows 12–14.
+
+**What the assistant contributed:**
+
+- `ConjuredTest.kt`: 14 tests, all disabled; all rows agree with the rule.
+- Golden master: exactly 4 lines change (24, 36, 48, 60, Conjured Mana Cake days 1–4).
+- Attack:
+  1. A conjured backstage pass keeps value after the concert (`0, 20 → -1, 16`, plain pass
+     `-1, 0`). **Rejected:** `Conjured` overrides every base rule by assumption; pinned as rows
+     12–13.
+  2. Rows 5, 6, 9 produce quality outside 0–50, and for `Conjured` no legacy code justifies it.
+     I answered that it never happens; it replied that row 9 is a realistic input (Sulfuras at 80)
+     and stays above 50 for 9 updates. **Open.**
+  3. The prefix has no word boundary (`ConjuredX`). **Accepted:** row 14, prefix becomes
+     `"Conjured "`.
+  4. Branch order is untested: no special name starts with `Conjured`.
+  5. The pinned `Conjured Aged Brie, 5, 10 → 4, 9` contradicts row 7; it changes to `4, 8` in the
+     `Conjured` commit.
+- **Refused my request** to drop the `@Disabled` markers so the tests could go in my `Conjured`
+  commit: `AGENTS.md` [84]. It proposed two commits that keep main green, since skipped tests do
+  not fail.
+- A mutation list for the tests once enabled.
+
+**How I checked it:**
+
+- `grep -c '@Disabled("pending Conjured")' ConjuredTest.kt`: 14.
+- Local run with my implementation in the working tree: `ConjuredTest` 14 skipped; only the golden
+  master and the pinned `Conjured Aged Brie` test fail, as expected before the `Conjured` commit.
+- The arithmetic of the 14 rows redone against the rule.
+
+**Verdict:** Modified
+**What I changed:** rejected objection 1 and pinned it (rows 12–13); accepted 3 (row 14, prefix
+`"Conjured "`); two commits instead of one, as `AGENTS.md` requires. Objection 2 is still open.
+
+**Resulting commit:** the `ConjuredTest.kt` commit, immediately before this entry.
 
 ---
