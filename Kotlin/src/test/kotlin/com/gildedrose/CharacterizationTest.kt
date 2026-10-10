@@ -128,12 +128,4 @@ internal class CharacterizationTest {
         app.updateQuality()
         assertEquals("Backstage passes to another concert, -1, 8", app.items[0].toString())
     }
-
-    @Test
-    fun `conjured aged brie is a normal item`() {
-        val items = listOf(Item("Conjured Aged Brie", 5, 10))
-        val app = GildedRose(items)
-        app.updateQuality()
-        assertEquals("Conjured Aged Brie, 4, 9", app.items[0].toString())
-    }
 }

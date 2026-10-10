@@ -1,11 +1,12 @@
 package com.gildedrose
 
-private enum class Category { AGED_BRIE, BACKSTAGE_PASSES, LEGENDARY, NORMAL }
+private enum class Category { AGED_BRIE, BACKSTAGE_PASSES, LEGENDARY, CONJURED, NORMAL }
 
 private fun categoryOf(item: Item): Category = when {
     item.name == "Aged Brie" -> Category.AGED_BRIE
     item.name == "Backstage passes to a TAFKAL80ETC concert" -> Category.BACKSTAGE_PASSES
     item.name == "Sulfuras, Hand of Ragnaros" -> Category.LEGENDARY
+    item.name.startsWith("Conjured ") -> Category.CONJURED
     else -> Category.NORMAL
 }
 
@@ -25,6 +26,7 @@ class GildedRose(val items: List<Item>) {
             Category.AGED_BRIE -> updateAgedBrie(item)
             Category.BACKSTAGE_PASSES -> updateBackstagePasses(item)
             Category.LEGENDARY -> {}
+            Category.CONJURED -> updateConjured(item)
             Category.NORMAL -> updateNormalItem(item)
         }
     }
@@ -33,6 +35,12 @@ class GildedRose(val items: List<Item>) {
         item.sellIn = item.sellIn - 1
         val increase = if (item.sellIn < 0) 2 else 1
         repeat(increase) { increaseQuality(item) }
+    }
+    
+    private fun updateConjured(item: Item) {
+        item.sellIn = item.sellIn - 1
+        val decrease = if (item.sellIn < 0) 4 else 2
+        repeat(decrease) { decreaseQuality(item) }
     }
 
     private fun updateNormalItem(item: Item) {
