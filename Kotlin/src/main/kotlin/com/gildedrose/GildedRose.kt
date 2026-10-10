@@ -13,56 +13,54 @@ class GildedRose(val items: List<Item>) {
 
     fun updateQuality() {
         for (item in items) {
-            val category = categoryOf(item)
-            if (category != Category.AGED_BRIE && category != Category.BACKSTAGE_PASSES) {
-                if (item.quality > 0) {
-                    if (category != Category.LEGENDARY) {
-                        item.quality = item.quality - 1
-                    }
-                }
-            } else {
-                if (item.quality < 50) {
-                    item.quality = item.quality + 1
-
-                    if (category == Category.BACKSTAGE_PASSES) {
-                        if (item.sellIn < 11) {
-                            if (item.quality < 50) {
-                                item.quality = item.quality + 1
-                            }
-                        }
-
-                        if (item.sellIn < 6) {
-                            if (item.quality < 50) {
-                                item.quality = item.quality + 1
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (category != Category.LEGENDARY) {
-                item.sellIn = item.sellIn - 1
-            }
-
-            if (item.sellIn < 0) {
-                if (category != Category.AGED_BRIE) {
-                    if (category != Category.BACKSTAGE_PASSES) {
-                        if (item.quality > 0) {
-                            if (category != Category.LEGENDARY) {
-                                item.quality = item.quality - 1
-                            }
-                        }
-                    } else {
-                        item.quality = item.quality - item.quality
-                    }
-                } else {
-                    if (item.quality < 50) {
-                        item.quality = item.quality + 1
-                    }
-                }
-            }
+            updateItem(item)
         }
     }
     
+    private fun updateItem(item: Item) {
+        when (categoryOf(item)) {
+            Category.AGED_BRIE -> updateAgedBrie(item)
+            Category.BACKSTAGE_PASSES -> updateBackstagePasses(item)
+            Category.LEGENDARY -> {}
+            Category.NORMAL -> updateNormalItem(item)
+        }
+    }
+    
+    private fun updateAgedBrie(item: Item) {
+        if (item.quality < 50) {
+            item.quality = item.quality + 1
+        }
+        item.sellIn = item.sellIn - 1
+        if (item.sellIn < 0 && item.quality < 50) {
+            item.quality = item.quality + 1
+        }
+    }
+ 
+    private fun updateBackstagePasses(item: Item) {
+        if (item.quality < 50) {
+            item.quality = item.quality + 1
+            if (item.sellIn < 11 && item.quality < 50) {
+                item.quality = item.quality + 1
+            }
+            if (item.sellIn < 6 && item.quality < 50) {
+                item.quality = item.quality + 1
+            }
+        }
+        item.sellIn = item.sellIn - 1
+        if (item.sellIn < 0) {
+            item.quality = 0
+        }
+    }
+ 
+    private fun updateNormalItem(item: Item) {
+        if (item.quality > 0) {
+            item.quality = item.quality - 1
+        }
+        item.sellIn = item.sellIn - 1
+        if (item.sellIn < 0 && item.quality > 0) {
+            item.quality = item.quality - 1
+        }
+    }
+     
 }
 
