@@ -36,6 +36,7 @@ modes the assistant is used in.
 | 00 | Session start: constraints restated before any code | Confirmed | none |
 | 01 | Golden master scaffolding over the upstream 30-day output | Accepted | `0ea38e4` |
 | 02 | Characterization tests for cases the golden master misses | Modified | `b115799` |
+| 03 | Adversarial review of the first three refactoring commits | Confirmed | none |
 
 ---
 
@@ -142,5 +143,61 @@ names). Plus 6 single mutations of `GildedRose.kt` with the tests each must fail
 **What I changed:** rejected objection 1; accepted 2 and 3, which changed the file.
 
 **Resulting commit:** `b115799`.
+
+---
+
+## 03 — Adversarial review of the first three refactoring commits
+
+**When:** 10 October 2026, after `e0fe293`, `043c97f` and `df7f230`.
+**Transcript:** [`ai-sessions/session.md`](ai-sessions/session.md), from the review of my three
+refactoring decisions.
+
+**What I asked for:** attack three decisions of mine: the name read only in `categoryOf`, mapped to
+an enum and dispatched through an exhaustive `when`; guarded increase/decrease helpers;
+duplicate-then-simplify instead of rewriting from the requirements. For each, the strongest
+alternative and one concrete case where my choice costs more. Also how `Conjured` fits under
+exact-name, prefix and contains matching, including the pinned `Conjured Aged Brie, 5, 10 -> 4, 9`
+and the branch order a prefix rule needs. Evidence as a diff or a test; the `Conjured` rule not
+decided.
+
+**What the assistant contributed:**
+
+- **Flagged a conflict with `AGENTS.md` [65–66]:** adversarial mode does not propose alternatives.
+  It kept each alternative to one named line, with no code and no recommendation.
+- **Behaviour: no objection.** 16,380 states (9 names × 20 `sellIn` × 91 quality, `Int` extremes
+  included) run through transcriptions of `043c97f` and `df7f230` against the original: 0
+  differences.
+- **Costs of my choices:**
+  1. A single enum cannot express `Conjured` as a modifier ("Brie, conjured"); the exhaustive
+     `when` does not protect name → category, since `else -> NORMAL` absorbs a misspelled name.
+  2. Helpers: no case found in the requirements where they cost more.
+  3. Duplicate-then-simplify gives nothing for `Conjured`, which has no legacy body.
+- **`Conjured` matching:** the golden master cannot tell the three rules apart; only the pinned
+  `Conjured Aged Brie` test separates exact from prefix/contains, and no test separates prefix from
+  contains. A prefix rule needs a `when` without subject, exact names first. No rule chosen.
+- **Four problems in the record:**
+  1. No test run on disk after `e0fe293`.
+  2. None of the three commits has the "X rather than Y because Z" line ([82–83]).
+  3. `043c97f` says "four copies of the legacy body" but the copies are already pruned: the
+     duplicate step is not visible in the history.
+  4. `df7f230` holds four ideas (helpers, `sellIn` decrement moved, `< 11`/`< 6` rewritten as
+     `<= 10`/`<= 5`, constants), against [82].
+
+**How I checked it:**
+
+- `git log -3 --format='%h [%b]'`: empty bodies on all three commits.
+- `git show 043c97f:…/GildedRose.kt | grep -n 'Category\.'`: matches only the mapping and the
+  dispatch, so the copies were pruned.
+- `git show df7f230`: the four changes are in the same diff.
+- Test results now on disk: a run on `df7f230` (compiled class contains `increaseQuality`), 18
+  tests, 0 failures. No run on disk for `043c97f`.
+- The 16,380-state comparison is on transcriptions, not on the Kotlin; the Gradle run on `df7f230`
+  is the real check.
+
+**Verdict:** Confirmed
+**What I changed:** nothing in the code. The history cannot be rewritten: the four problems stay
+recorded here.
+
+**Resulting commit:** none.
 
 ---
