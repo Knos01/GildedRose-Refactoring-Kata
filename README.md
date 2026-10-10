@@ -1,3 +1,11 @@
+> **Submission for PTV Logistics — Kotlin solution**
+>
+> - Solution, decisions and how to run the tests: [`Kotlin/README.md`](Kotlin/README.md)
+> - How AI was used: [`AGENTS.md`](AGENTS.md) (rules) · [`AI-LOG.md`](AI-LOG.md) (log) · [`ai-sessions/`](ai-sessions/) (transcript)
+> - The git history is part of the submission: `git log --oneline` from `00a8e19` shows the order of the work.
+>
+> Everything below this box is the original kata README.
+
 _Support this and all my katas via [Patreon](https://www.patreon.com/EmilyBache)_
 
 # Gilded Rose Refactoring Kata
