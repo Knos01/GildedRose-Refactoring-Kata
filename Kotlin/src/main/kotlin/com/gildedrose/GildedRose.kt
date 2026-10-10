@@ -9,6 +9,9 @@ private fun categoryOf(item: Item): Category = when (item.name) {
     else -> Category.NORMAL
 }
 
+private const val MIN_QUALITY = 0
+private const val MAX_QUALITY = 50
+
 class GildedRose(val items: List<Item>) {
 
     fun updateQuality() {
@@ -27,37 +30,39 @@ class GildedRose(val items: List<Item>) {
     }
     
     private fun updateAgedBrie(item: Item) {
-        if (item.quality < 50) {
-            item.quality = item.quality + 1
-        }
         item.sellIn = item.sellIn - 1
-        if (item.sellIn < 0 && item.quality < 50) {
-            item.quality = item.quality + 1
-        }
+        val increase = if (item.sellIn < 0) 2 else 1
+        repeat(increase) { increaseQuality(item) }
+    }
+
+    private fun updateNormalItem(item: Item) {
+        item.sellIn = item.sellIn - 1
+        val decrease = if (item.sellIn < 0) 2 else 1
+        repeat(decrease) { decreaseQuality(item) }
     }
  
     private fun updateBackstagePasses(item: Item) {
-        if (item.quality < 50) {
-            item.quality = item.quality + 1
-            if (item.sellIn < 11 && item.quality < 50) {
-                item.quality = item.quality + 1
-            }
-            if (item.sellIn < 6 && item.quality < 50) {
-                item.quality = item.quality + 1
-            }
+        val increase = when {
+            item.sellIn <= 5 -> 3
+            item.sellIn <= 10 -> 2
+            else -> 1
         }
+        repeat(increase) { increaseQuality(item) }
+        
         item.sellIn = item.sellIn - 1
         if (item.sellIn < 0) {
             item.quality = 0
         }
     }
- 
-    private fun updateNormalItem(item: Item) {
-        if (item.quality > 0) {
-            item.quality = item.quality - 1
+    
+    private fun increaseQuality(item: Item) {
+        if (item.quality < MAX_QUALITY) {
+            item.quality = item.quality + 1
         }
-        item.sellIn = item.sellIn - 1
-        if (item.sellIn < 0 && item.quality > 0) {
+    }
+ 
+    private fun decreaseQuality(item: Item) {
+        if (item.quality > MIN_QUALITY) {
             item.quality = item.quality - 1
         }
     }
